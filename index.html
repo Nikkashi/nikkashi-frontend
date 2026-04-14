@@ -2018,7 +2018,10 @@ function onPaymentSuccess(paymentId) {
   closeCheckout();
   // Reduce stock for purchased items (client-side mirror)
   _lastOrderCart.forEach(item => { if (item.sku) reduceStock(item.sku); });
-  renderHomeBestsellers(); // 🔥 re-render cards immediately so sold out shows
+  // 🔥 re-render both grids immediately so sold out shows without refresh
+  renderHomeBestsellers();
+  const activeFilter = document.querySelector('.filter-tab.active');
+  renderShop(products.length ? products : STATIC_PRODUCTS, activeFilter ? activeFilter.dataset.filter || 'all' : 'all');
   // Save cart for server-side recovery (fire and forget)
   if (NIKKASHI_CONFIG.BACKEND_URL && _lastCustomer.phone) {
     fetch(NIKKASHI_CONFIG.BACKEND_URL + '/save-cart', {
