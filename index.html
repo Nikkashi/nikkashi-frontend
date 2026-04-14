@@ -2018,6 +2018,7 @@ function onPaymentSuccess(paymentId) {
   closeCheckout();
   // Reduce stock for purchased items (client-side mirror)
   _lastOrderCart.forEach(item => { if (item.sku) reduceStock(item.sku); });
+  renderHomeBestsellers(); // 🔥 re-render cards immediately so sold out shows
   // Save cart for server-side recovery (fire and forget)
   if (NIKKASHI_CONFIG.BACKEND_URL && _lastCustomer.phone) {
     fetch(NIKKASHI_CONFIG.BACKEND_URL + '/save-cart', {
