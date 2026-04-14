@@ -1743,9 +1743,9 @@ function openModal(pJson) {
 
   // Dynamic proof + real stock + viewer count
   const sold = p.reviews ? p.reviews * 3 : 120;
-  const stockNow = getStock(p.sku);
+  const stockNow = p.stock !== undefined ? p.stock : getStock(p.sku);
   document.getElementById('modalProof').innerHTML = `⭐ ${p.rating} · ${p.reviews} reviews · 🔥 ${sold}+ sold`;
-  document.getElementById('modalUrgency').innerHTML = getStockLabel(p.sku);
+  const _s = p.stock !== undefined ? p.stock : getStock(p.sku); document.getElementById('modalUrgency').innerHTML = _s <= 0 ? '❌ Sold Out' : _s <= 3 ? `⚠ Only ${_s} left` : `✅ ${_s} in stock`;
 
   // Viewer count — add element if not present
   let viewerEl = document.getElementById('modalViewers');
