@@ -1677,7 +1677,7 @@ function renderCard(p) {
       <div class="card-detail">${p.category} · ${p.material || ''}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;">
         <div class="card-price">₹${p.price.toLocaleString('en-IN')}</div>
-        <div style="font-size:0.65rem;font-weight:700;color:#aaa;">⭐${p.rating} (${p.reviews})</div>
+        <div style="font-size:0.65rem;font-weight:700;color:#aaa;">⭐${p.rating || "4.8"} (${p.reviews || "50"})</div>
       </div>
       <div class="card-stock" style="${p.stock <= 3 ? 'color:var(--hot-pink);font-weight:800;' : ''}">${stockLabel}</div>
     </div>
@@ -1744,7 +1744,7 @@ function openModal(pJson) {
   // Dynamic proof + real stock + viewer count
   const sold = p.reviews ? p.reviews * 3 : 120;
   const stockNow = p.stock !== undefined ? p.stock : getStock(p.sku);
-  document.getElementById('modalProof').innerHTML = `⭐ ${p.rating} · ${p.reviews} reviews · 🔥 ${sold}+ sold`;
+  document.getElementById('modalProof').innerHTML = `⭐ ${p.rating || "4.8"} · ${p.reviews || 50} reviews · 🔥 ${sold}+ sold`;
   const _s = p.stock !== undefined ? p.stock : getStock(p.sku); document.getElementById('modalUrgency').innerHTML = _s <= 0 ? '❌ Sold Out' : _s <= 3 ? `⚠ Only ${_s} left` : `✅ ${_s} in stock`;
 
   // Viewer count — add element if not present
