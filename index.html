@@ -1725,6 +1725,16 @@ function openModal(pJson) {
 
   document.getElementById('modalDesc').textContent = p.desc;
   document.getElementById('modalPh').textContent = p.emoji;
+  const modalWrap = document.getElementById('modalImgWrap');
+  const existingImg = modalWrap.querySelector('img');
+  if (existingImg) existingImg.remove();
+  if (p.image) {
+    const img = document.createElement('img');
+    img.src = p.image;
+    img.alt = p.name;
+    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    modalWrap.insertBefore(img, modalWrap.firstChild);
+  }
 
   // Badge
   const badgeEl = document.getElementById('modalBadge');
