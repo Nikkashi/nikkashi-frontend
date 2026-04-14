@@ -1031,6 +1031,7 @@ nav {
   <div class="success-title">Order Placed!</div>
   <p class="success-subtitle">Thank you for shopping with POP by Nikkashi</p>
   <div class="success-order-id" id="successOrderId"></div>
+  <div id="successItemsList" style="width:100%;max-width:340px;margin:0.8rem auto;background:#fafafa;border-radius:14px;padding:0.8rem 1rem;text-align:left;font-size:0.82rem;color:#444;"></div>
   <div class="success-meta">
     <div class="success-meta-row">🚚 <span>Estimated delivery: <strong>3–5 business days</strong></span></div>
     <div class="success-meta-row">✅ <span id="successPayLine">Payment confirmed</span></div>
@@ -1973,10 +1974,8 @@ var _lastOrderId = '';
 var _lastOrderCart = [];
 var _lastOrderTotal = 0;
 var _lastCustomer = {};
-var _orderInFlight = false;  // 🔒 double-click guard
 
 async function startPayment() {
-  if (_orderInFlight) return;  // block concurrent calls
   const name    = document.getElementById('custName').value.trim();
   const phone   = document.getElementById('custPhone').value.trim();
   const address = document.getElementById('custAddress').value.trim();
@@ -1991,8 +1990,8 @@ async function startPayment() {
   _lastOrderTotal = total;
   _lastCustomer   = customer;
 
-  _orderInFlight = true;
   btn.disabled = true;
+  btn.classList.add('clicked');
   setTimeout(() => btn.classList.remove('clicked'), 150);
   btn.textContent = 'Placing Order…';
 
@@ -2024,7 +2023,6 @@ async function startPayment() {
     }
 
   } catch(e) {
-    _orderInFlight = false;
     showToast(e.message || 'Something went wrong. Please try again.');
     btn.disabled = false;
     btn.textContent = `Complete Order — ₹${total.toLocaleString('en-IN')} 🔒`;
@@ -2032,7 +2030,6 @@ async function startPayment() {
 }
 
 function onPaymentSuccess(paymentId) {
-  _orderInFlight = false;  // 🔒 release guard
   closeCheckout();
   // Reduce stock for purchased items (client-side mirror)
   _lastOrderCart.forEach(item => { if (item.sku) reduceStock(item.sku); });
@@ -2064,6 +2061,21 @@ function showSuccess(orderId, paymentId) {
     document.getElementById('successOrderId').dataset.paymentId = paymentId;
     const payLine = document.getElementById('successPayLine');
     if (payLine) payLine.textContent = 'Payment ID: ' + paymentId;
+  }
+  // Populate items list
+  const itemsList = document.getElementById('successItemsList');
+  if (itemsList && _lastOrderCart.length) {
+    const rows = _lastOrderCart.map(i =>
+      `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #f0f0f0;">
+        <span>${i.emoji || '💎'} ${i.name}</span>
+        <span style="font-weight:700;color:#ff3e6c;">₹${i.price.toLocaleString('en-IN')}</span>
+      </div>`
+    ).join('');
+    const total = `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;font-weight:800;font-size:0.88rem;">
+      <span>Total</span>
+      <span style="color:#ff3e6c;">₹${_lastOrderTotal.toLocaleString('en-IN')}</span>
+    </div>`;
+    itemsList.innerHTML = rows + total;
   }
   document.getElementById('successScreen').classList.add('open');
 }
