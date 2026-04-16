@@ -1630,6 +1630,30 @@ attemptFetch(3);
 }
 
 // Called whenever products array is ready / updated
+
+// ── CATEGORY CARDS with live images ──────────────────────────────────────────
+function renderCategoryCards() {
+  ['Earring','Brooch','Bracelet'].forEach(cat => {
+    const card = document.getElementById('catCard-' + cat);
+    const countEl = document.getElementById('catCount-' + cat);
+    if (!card) return;
+    const catProducts = products.filter(p => p.category === cat && p.image);
+    if (countEl) countEl.textContent = catProducts.length + ' Styles';
+    if (!catProducts.length) return;
+    const pick = catProducts[Math.floor(Math.random() * Math.min(catProducts.length, 5))];
+    const img = document.createElement('img');
+    img.className = 'cat-card-img';
+    img.alt = cat;
+    img.onload = () => img.classList.add('loaded');
+    img.src = pick.image;
+    const ph = card.querySelector('.cat-placeholder-bg');
+    if (ph) ph.style.display = 'none';
+    // Remove any existing cat-card-img first
+    const existing = card.querySelector('.cat-card-img');
+    if (existing) existing.remove();
+    card.insertBefore(img, card.firstChild);
+  });
+}
 function _onProductsReady() {
   renderCategoryCards();
   renderHomeBestsellers();
