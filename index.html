@@ -1574,6 +1574,10 @@ var products = [];
 
 // ── LOAD PRODUCTS (from Railway backend with static fallback) ────────────────
 function loadProducts() {
+  // Keep Railway awake
+setInterval(() => fetch(NIKKASHI_CONFIG.BACKEND_URL + '/health').catch(()=>{}), 14 * 60 * 1000);
+
+function attemptFetch(retries) {
   fetch(NIKKASHI_CONFIG.BACKEND_URL + '/products')
     .then(res => res.json())
     .then(data => {
@@ -1583,10 +1587,17 @@ function loadProducts() {
       _onProductsReady();
     })
     .catch(e => {
-      console.warn('[Nikkashi] Backend fetch failed — using static fallback.', e);
-      products = STATIC_PRODUCTS.slice();
-      _onProductsReady();
+      if (retries > 0) {
+        console.warn('[Nikkashi] Retrying...', retries);
+        setTimeout(() => attemptFetch(retries - 1), 4000);
+      } else {
+        console.warn('[Nikkashi] Backend fetch failed — using static fallback.', e);
+        products = STATIC_PRODUCTS.slice();
+        _onProductsReady();
+      }
     });
+}
+attemptFetch(3);
 }
 
 // Called whenever products array is ready / updated
